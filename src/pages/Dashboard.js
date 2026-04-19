@@ -1,12 +1,12 @@
 import React from 'react';
 import { Container, Row, Col, Card, ProgressBar, Button } from 'react-bootstrap';
-import { BookOpen, Heart, Clock, Award } from 'lucide-react';
+import { BookOpen, Heart, Clock, Award, Crown, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import BookCard from '../components/BookCard';
 import { useAppContext } from '../context/AppContext';
 
 const Dashboard = () => {
-  const { user, favorites, becomeAuthor, books } = useAppContext();
+  const { user, favorites, becomeAuthor, upgradeToPremium, books } = useAppContext();
   const navigate = useNavigate();
   
   const readingBooks = books.slice(0, 2);
@@ -22,14 +22,38 @@ const Dashboard = () => {
         </div>
 
         {user?.role !== 'author' && (
-          <div className="bg-purple-gradient border border-purple p-4 rounded-4 shadow-sm mb-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+          <div className="bg-purple-gradient border border-purple p-4 rounded-4 shadow-sm mb-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
             <div>
-              <h4 className="fw-bold mb-1 text-purple">Have a story to share?</h4>
-              <p className="text-muted mb-0">Join our community of creators. Publish your own books and track your success.</p>
+              <h4 className="fw-bold mb-1 text-white">Have a story to share?</h4>
+              <p className="text-white text-opacity-75 mb-0">Join our community of creators. Publish your own books and track your success.</p>
             </div>
-            <Button onClick={becomeAuthor} className="btn-purple px-4 py-2 text-nowrap shadow-sm hover-lift">
+            <Button onClick={becomeAuthor} className="btn-light px-4 py-2 text-nowrap shadow-sm hover-lift text-purple fw-bold">
               Become an Author
             </Button>
+          </div>
+        )}
+
+        {(!user?.isPremium && user?.role !== 'admin') && (
+          <div className="bg-warning bg-opacity-10 border border-warning p-4 rounded-4 shadow-sm mb-5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+            <div>
+              <h4 className="fw-bold mb-1 text-dark d-flex align-items-center gap-2">
+                <Crown size={24} className="text-warning" /> Upgrade to Premium
+              </h4>
+              <p className="text-muted mb-0">Unlock exclusive premium books, PDF downloads, and support your favorite authors.</p>
+            </div>
+            <Button onClick={upgradeToPremium} variant="warning" className="px-4 py-3 text-nowrap shadow-sm hover-lift fw-bold">
+              Upgrade Now
+            </Button>
+          </div>
+        )}
+
+        {user?.isPremium && (
+          <div className="bg-success bg-opacity-10 border border-success p-4 rounded-4 shadow-sm mb-5 d-flex align-items-center gap-3">
+            <CheckCircle size={32} className="text-success" />
+            <div>
+              <h5 className="fw-bold mb-1 text-success">Premium Membership Active</h5>
+              <p className="text-muted mb-0 small">You have full access to all premium books, downloads, and features.</p>
+            </div>
           </div>
         )}
 

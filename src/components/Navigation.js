@@ -1,7 +1,7 @@
 import React from 'react';
 import { Navbar, Nav, Container, Button } from 'react-bootstrap';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { BookOpen, LogIn, UserPlus, User as UserIcon, LogOut } from 'lucide-react';
+import { BookOpen, LogIn, UserPlus, User as UserIcon, LogOut, Shield, Crown } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 
 const Navigation = () => {
@@ -38,11 +38,17 @@ const Navigation = () => {
             <div className="d-flex gap-2 ms-lg-3 mt-3 mt-lg-0">
               {user ? (
                 <>
-                  <NavLink to="/dashboard" className="nav-pill-btn">
-                    <UserIcon size={18} /> Dashboard
+                  <NavLink to="/dashboard" className={`nav-pill-btn ${user.isPremium ? 'text-warning border-warning bg-warning bg-opacity-10' : ''}`}>
+                    {user.isPremium ? <Crown size={18} /> : <UserIcon size={18} />} 
+                    Dashboard {user.isPremium && <span className="badge bg-warning ms-1 text-dark">Premium</span>}
                   </NavLink>
+                  {user.role === 'admin' && (
+                    <NavLink to="/admin" className="nav-pill-btn text-danger border-danger">
+                      <Shield size={18} /> Admin Area
+                    </NavLink>
+                  )}
                   {user.role === 'author' && (
-                    <NavLink to="/author" className="nav-pill-btn text-warning border-warning">
+                    <NavLink to="/author" className="nav-pill-btn text-info border-info">
                       <BookOpen size={18} /> Author Space
                     </NavLink>
                   )}

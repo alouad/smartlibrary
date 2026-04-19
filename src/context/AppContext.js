@@ -1,5 +1,5 @@
 import React, { createContext, useState, useContext } from 'react';
-import { booksData as mockBooks } from '../data/mockData';
+import { booksData as mockBooks, initialUsersData } from '../data/mockData';
 
 const AppContext = createContext();
 
@@ -7,6 +7,10 @@ export const AppProvider = ({ children }) => {
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem('user');
     return saved ? JSON.parse(saved) : null;
+  });
+  const [usersList, setUsersList] = useState(() => {
+    const saved = localStorage.getItem('usersList');
+    return saved ? JSON.parse(saved) : initialUsersData;
   });
   const [favorites, setFavorites] = useState(() => {
     const saved = localStorage.getItem('favorites');
@@ -25,9 +29,9 @@ export const AppProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : mockBooks;
   });
 
-  // Simplified auth mock logic
   const login = (userData) => {
-    const data = userData || { name: 'Demo User', level: 5 };
+    const existingUser = usersList.find(u => u.email === userData.email);
+    const data = existingUser || { ...userData, role: 'user', isPremium: false, joinDate: new Date().toISOString().split('T')[0] };
     setUser(data);
     localStorage.setItem('user', JSON.stringify(data));
   };
@@ -42,6 +46,40 @@ export const AppProvider = ({ children }) => {
       const updatedUser = { ...user, role: 'author' };
       setUser(updatedUser);
       localStorage.setItem('user', JSON.stringify(updatedUser));
+      
+      // Update in usersList
+      const newUsersList = usersList.map(u => u.email === user.email ? updatedUser : u);
+      setUsersList(newUsersList);
+      localStorage.setItem('usersList', JSON.stringify(newUsersList));
+    }
+  };
+
+  const upgradeToPremium = () => {
+    if (user) {
+      const updatedUser = { ...user, isPremium: true };
+      setUser(updatedUser);
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+
+      // Update in usersList
+      const newUsersList = usersList.map(u => u.email === user.email ? updatedUser : u);
+      setUsersList(newUsersList);
+      localStorage.setItem('usersList', JSON.stringify(newUsersList));
+    }
+  };
+
+  const adminUpdateUser = (targetEmail, updates) => {
+    if (user && user.role === 'admin') {
+      const newUsersList = usersList.map(u => u.email === targetEmail ? { ...u, ...updates } : u);
+      setUsersList(newUsersList);
+      localStorage.setItem('usersList', JSON.stringify(newUsersList));
+    }
+  };
+
+  const adminDeleteUser = (targetEmail) => {
+    if (user && user.role === 'admin') {
+      const newUsersList = usersList.filter(u => u.email !== targetEmail);
+      setUsersList(newUsersList);
+      localStorage.setItem('usersList', JSON.stringify(newUsersList));
     }
   };
   
@@ -82,7 +120,10 @@ export const AppProvider = ({ children }) => {
   };
 
   return (
-    <AppContext.Provider value={{ user, login, logout, becomeAuthor, favorites, toggleFavorite, bookmarks, saveBookmark, reviews, addReview, books, addBook }}>
+    <AppContext.Provider value={{ 
+      user, usersList, login, logout, becomeAuthor, upgradeToPremium, adminUpdateUser, adminDeleteUser,
+      favorites, toggleFavorite, bookmarks, saveBookmark, reviews, addReview, books, addBook 
+    }}>
       {children}
     </AppContext.Provider>
   );

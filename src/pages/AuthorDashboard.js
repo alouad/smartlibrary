@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Card, Button, Badge, Modal, Form } from 'react-bootstrap';
-import { BookOpen, Star, MessageSquare, PlusCircle, BarChart2 } from 'lucide-react';
+import { BookOpen, Star, MessageSquare, PlusCircle, BarChart2, Crown, Download } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAppContext } from '../context/AppContext';
 import BookCard from '../components/BookCard';
+import { mockAuthorStats } from '../data/mockData';
 
 const AuthorDashboard = () => {
   const { user, reviews, books, addBook } = useAppContext();
@@ -13,15 +14,17 @@ const AuthorDashboard = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showReviewsModal, setShowReviewsModal] = useState(false);
   const [selectedBookObj, setSelectedBookObj] = useState(null);
-  const [newBook, setNewBook] = useState({ title: '', category: 'Fiction', description: '', pages: '', cover: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=400', content: '', pdfUrl: '' });
+  const [newBook, setNewBook] = useState({ title: '', category: 'Fiction', description: '', pages: '', cover: 'https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=400', content: '', pdfUrl: '', isPremium: false });
 
   // Filter books manually for the logged-in author
   const authorBooks = books.filter(b => b.author.toLowerCase() === (user?.name || '').toLowerCase());
   
   // Calculate mock stats
+  // Calculate mock stats
   const totalBooks = authorBooks.length;
-  const avgRating = totalBooks > 0 ? (authorBooks.reduce((acc, curr) => acc + curr.rating, 0) / totalBooks).toFixed(1) : 0;
-  const totalReaders = totalBooks * 1240; // mock number
+  const avgRating = mockAuthorStats.averageRating || (totalBooks > 0 ? (authorBooks.reduce((acc, curr) => acc + curr.rating, 0) / totalBooks).toFixed(1) : 0);
+  const totalReaders = mockAuthorStats.totalReads || totalBooks * 1240;
+  const totalDownloads = mockAuthorStats.downloads || 0;
 
   const handleAddBook = (e) => {
     e.preventDefault();
@@ -72,7 +75,7 @@ const AuthorDashboard = () => {
 
         {/* Stats Section */}
         <Row className="g-4 mb-5">
-          <Col md={4}>
+          <Col md={3}>
             <Card className="border-0 shadow-sm rounded-4 h-100 hover-lift">
               <Card.Body className="p-4 d-flex align-items-center gap-3">
                 <div className="bg-purple text-white p-3 rounded-circle d-flex align-items-center justify-content-center">
@@ -85,7 +88,7 @@ const AuthorDashboard = () => {
               </Card.Body>
             </Card>
           </Col>
-          <Col md={4}>
+          <Col md={3}>
             <Card className="border-0 shadow-sm rounded-4 h-100 hover-lift">
               <Card.Body className="p-4 d-flex align-items-center gap-3">
                 <div className="bg-success text-white p-3 rounded-circle d-flex align-items-center justify-content-center">
@@ -98,7 +101,20 @@ const AuthorDashboard = () => {
               </Card.Body>
             </Card>
           </Col>
-          <Col md={4}>
+          <Col md={3}>
+            <Card className="border-0 shadow-sm rounded-4 h-100 hover-lift">
+              <Card.Body className="p-4 d-flex align-items-center gap-3">
+                <div className="bg-primary text-white p-3 rounded-circle d-flex align-items-center justify-content-center">
+                  <Download size={24} />
+                </div>
+                <div>
+                  <h3 className="fw-bold mb-0 text-dark">{totalDownloads.toLocaleString()}</h3>
+                  <p className="text-muted mb-0 small">Total Downloads</p>
+                </div>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md={3}>
             <Card className="border-0 shadow-sm rounded-4 h-100 hover-lift">
               <Card.Body className="p-4 d-flex align-items-center gap-3">
                 <div className="bg-warning text-white p-3 rounded-circle d-flex align-items-center justify-content-center">
@@ -192,6 +208,17 @@ const AuthorDashboard = () => {
                   <Form.Label className="fw-medium">Cover Image URL</Form.Label>
                   <Form.Control type="url" required value={newBook.cover} onChange={(e) => setNewBook({...newBook, cover: e.target.value})} />
                 </Form.Group>
+                <div className="p-3 bg-warning bg-opacity-10 rounded-3 border border-warning mt-4">
+                  <Form.Check 
+                    type="switch"
+                    id="premium-switch"
+                    label={<><Crown size={16} className="text-warning mb-1 me-1"/> Make this a Premium Book</>}
+                    checked={newBook.isPremium}
+                    onChange={(e) => setNewBook({...newBook, isPremium: e.target.checked})}
+                    className="fw-bold"
+                  />
+                  <small className="text-muted d-block mt-2">Only Premium Subscribers will be able to read and download this book.</small>
+                </div>
               </Col>
             </Row>
             <div className="d-flex justify-content-end mt-4">

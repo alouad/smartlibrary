@@ -7,8 +7,17 @@ import { useAppContext } from '../context/AppContext';
 const Reader = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { bookmarks, saveBookmark, books } = useAppContext();
+  const { user, bookmarks, saveBookmark, books } = useAppContext();
   const book = books.find(b => b.id === parseInt(id)) || books[0];
+
+  React.useEffect(() => {
+    if (book && book.isPremium) {
+      if (!user || (!user.isPremium && user.role !== 'admin')) {
+        navigate(`/book/${book.id}`);
+      }
+    }
+  }, [book, user, navigate]);
+
   const [page, setPage] = useState(bookmarks[parseInt(id)] || 1);
   const totalPages = book.pages || 300;
   

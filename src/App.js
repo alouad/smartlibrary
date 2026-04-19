@@ -12,6 +12,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import Dashboard from './pages/Dashboard';
 import Reader from './pages/Reader';
 import AuthorDashboard from './pages/AuthorDashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import './App.css';
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
               <Route path="/forgot-password" element={<ForgotPassword />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/author" element={<AuthorDashboard />} />
+              <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/read/:id" element={<Reader />} />
             </Routes>
           </main>

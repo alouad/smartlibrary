@@ -13,7 +13,7 @@ const Login = () => {
     e.preventDefault();
     const namePart = email.split('@')[0];
     const formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
-    login({ name: formattedName || 'Reader', level: 5 });
+    login({ email: email, name: formattedName || 'Reader', level: 5 });
     navigate('/dashboard');
   };
 

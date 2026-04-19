@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Row, Col, Button, Badge, Form } from 'react-bootstrap';
-import { ArrowLeft, Star, FileText, Calendar, Hash, BookOpen, Heart, MessageSquare } from 'lucide-react';
+import { ArrowLeft, Star, FileText, Calendar, Hash, BookOpen, Heart, MessageSquare, Download, Crown, Lock } from 'lucide-react';
 import { useParams, useNavigate } from 'react-router-dom';
 import BookCard from '../components/BookCard';
 import { useAppContext } from '../context/AppContext';
@@ -17,6 +17,21 @@ const BookDetail = () => {
   const similarBooks = books.filter(b => b.id !== book.id).slice(0, 3);
   const isFavorite = favorites.includes(book.id);
   const bookReviews = reviews[book.id] || [];
+
+  const hasAccess = !book.isPremium || (user && (user.isPremium || user.role === 'admin'));
+
+  const handleDownloadPDF = () => {
+    const content = `SmartLibrary Premium Book Download\n\nTitle: ${book.title}\nAuthor: ${book.author}\n\nThis is a mock PDF generated securely for Premium Members.\nEnjoy your read!`;
+    const blob = new Blob([content], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${book.title.replace(/\s+/g, '_')}_Premium.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const handleReviewSubmit = (e) => {
     e.preventDefault();
@@ -88,32 +103,56 @@ const BookDetail = () => {
               </Row>
 
               <div className="mb-5">
-                <h4 className="fw-bold mb-3">Description</h4>
-                <p className="text-muted lh-lg" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>{book.description}</p>
+                <h4 className="fw-bold mb-3 d-flex align-items-center">
+                  Description 
+                  {book.isPremium && <Badge bg="warning" text="dark" className="ms-3 fs-6 rounded-pill"><Crown size={16} className="me-1"/> Premium Book</Badge>}
+                </h4>
+                <p className="text-muted lh-lg" style={{ wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                  {hasAccess ? book.description : book.description.substring(0, 100) + '...'}
+                </p>
               </div>
 
-              <div className="d-flex gap-3">
-                <Button 
-                  className="btn-purple flex-grow-1 d-flex justify-content-center align-items-center gap-2 py-3 fs-5" 
-                  onClick={() => navigate(`/read/${book.id}`)}
-                >
-                  <BookOpen size={20} /> Start Reading
-                </Button>
-                <Button 
-                  variant="outline-secondary" 
-                  className={`px-4 py-3 d-flex align-items-center justify-content-center rounded-3 ${isFavorite ? 'bg-light' : 'bg-white'}`}
-                  style={{ borderColor: isFavorite ? 'var(--primary-purple)' : '#dee2e6' }} 
-                  onClick={() => {
-                    if (!user) {
-                      navigate('/login');
-                      return;
-                    }
-                    toggleFavorite(book.id);
-                  }}
-                >
-                  <Heart size={20} className="text-purple" style={{ color: 'var(--primary-purple)' }} fill={isFavorite ? "currentColor" : "none"} />
-                </Button>
-              </div>
+              {!hasAccess ? (
+                <div className="bg-warning bg-opacity-10 p-4 rounded-4 border border-warning mb-4 text-center">
+                  <Lock size={32} className="text-warning mb-2" />
+                  <h5 className="fw-bold text-dark">Premium Content</h5>
+                  <p className="text-muted mb-4">You need an active Premium Membership to read this book.</p>
+                  <Button variant="warning" className="w-100 fw-bold py-3 text-dark d-flex justify-content-center align-items-center gap-2" onClick={() => navigate('/dashboard')}>
+                    <Crown size={20} /> Upgrade to Premium Now
+                  </Button>
+                </div>
+              ) : (
+                <div className="d-flex flex-column gap-3">
+                  <div className="d-flex gap-3">
+                    <Button 
+                      className="btn-purple flex-grow-1 d-flex justify-content-center align-items-center gap-2 py-3 fs-5" 
+                      onClick={() => navigate(`/read/${book.id}`)}
+                    >
+                      <BookOpen size={20} /> Start Reading
+                    </Button>
+                    <Button 
+                      variant="outline-secondary" 
+                      className={`px-4 py-3 d-flex align-items-center justify-content-center rounded-3 ${isFavorite ? 'bg-light' : 'bg-white'}`}
+                      style={{ borderColor: isFavorite ? 'var(--primary-purple)' : '#dee2e6' }} 
+                      onClick={() => {
+                        if (!user) {
+                          navigate('/login');
+                          return;
+                        }
+                        toggleFavorite(book.id);
+                      }}
+                    >
+                      <Heart size={20} className="text-purple" style={{ color: 'var(--primary-purple)' }} fill={isFavorite ? "currentColor" : "none"} />
+                    </Button>
+                  </div>
+                  
+                  {book.isPremium && (
+                    <Button variant="outline-success" className="w-100 py-3 d-flex justify-content-center align-items-center gap-2" onClick={handleDownloadPDF}>
+                      <Download size={20} /> Download PDF (Premium)
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
             
             {/* Reviews Section */}
