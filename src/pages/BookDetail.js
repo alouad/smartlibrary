@@ -146,11 +146,21 @@ const BookDetail = () => {
                     </Button>
                   </div>
                   
-                  {book.isPremium && (
-                    <Button variant="outline-success" className="w-100 py-3 d-flex justify-content-center align-items-center gap-2" onClick={handleDownloadPDF}>
-                      <Download size={20} /> Download PDF (Premium)
-                    </Button>
-                  )}
+                  <Button 
+                    variant={user && (user.isPremium || user.role === 'admin') ? "outline-success" : "outline-secondary"} 
+                    className="w-100 py-3 d-flex justify-content-center align-items-center gap-2" 
+                    onClick={() => {
+                      if (user && (user.isPremium || user.role === 'admin')) {
+                        handleDownloadPDF();
+                      } else {
+                        alert("Please upgrade to a Premium Subscription to download books.");
+                        navigate('/dashboard');
+                      }
+                    }}
+                  >
+                    {user && (user.isPremium || user.role === 'admin') ? <Download size={20} /> : <Lock size={20} className="text-secondary" />}
+                    {user && (user.isPremium || user.role === 'admin') ? "Download PDF (Premium Feature)" : "Download PDF (Premium Only)"}
+                  </Button>
                 </div>
               )}
             </div>
