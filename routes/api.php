@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\FavoriteController;
 use App\Http\Controllers\Api\RatingController;
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\BookController as PremiumBookController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -22,6 +23,10 @@ Route::get('/categories/{category}', [CategoryController::class, 'show']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/profile', [AuthController::class, 'profile']);
+    
+    // Premium / Reader Books Access
+    Route::get('/books/{book}/download', [PremiumBookController::class, 'downloadPdf']);
+    Route::get('/books/{book}/read', [PremiumBookController::class, 'readOnline']);
     
     // Reader Routes
     Route::middleware('reader')->group(function () {

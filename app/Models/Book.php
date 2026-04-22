@@ -15,6 +15,7 @@ class Book extends Model
         'description',
         'cover_image',
         'file_path',
+        'is_premium',
         'published_date',
         'isbn',
         'page_count',
@@ -28,6 +29,7 @@ class Book extends Model
             'published_date' => 'date',
             'page_count' => 'integer',
             'views_count' => 'integer',
+            'is_premium' => 'boolean',
         ];
     }
 
@@ -36,7 +38,7 @@ class Book extends Model
      */
     public function author()
     {
-        return $this->belongsTo(Author::class);
+        return $this->belongsTo(User::class, 'author_id');
     }
 
     /**

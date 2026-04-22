@@ -3,38 +3,47 @@
 namespace App\Policies;
 
 use App\Models\Book;
+use App\Models\User;
 
 class BookPolicy
 {
     /**
-     * Determine if the given user can update the given book.
+     * Determine whether the user can download the book.
      */
-    public function update($user, Book $book): bool
+    public function download(User $user, Book $book): bool
     {
-        if ($user instanceof \App\Models\User) {
-            return true; // Admin can update
-        }
-
-        if ($user instanceof \App\Models\Author) {
-            return $user->id === $book->author_id;
-        }
-
-        return false;
+        return $this->checkAccess($user, $book);
     }
 
     /**
-     * Determine if the given user can delete the given book.
+     * Determine whether the user can read the book online.
      */
-    public function delete($user, Book $book): bool
+    public function readOnline(User $user, Book $book): bool
     {
-        if ($user instanceof \App\Models\User) {
-            return true; // Admin can delete
+        return $this->checkAccess($user, $book);
+    }
+
+    /**
+     * Logique de vérification commune.
+     */
+    protected function checkAccess(User $user, Book $book): bool
+    {
+        // Les admins ont toujours accès
+        if ($user->isAdmin()) {
+            return true;
         }
 
-        if ($user instanceof \App\Models\Author) {
-            return $user->id === $book->author_id;
+        // L'auteur du livre a accès à son propre livre
+        if ($user->isAuteur() && $book->author_id === $user->id) {
+            return true;
         }
 
-        return false;
+        // Si le livre n'est pas premium, tout le monde (authentifié) a accès
+        if (!$book->is_premium) {
+            return true;
+        }
+
+        // Si le livre est premium, l'utilisateur (lecteur) doit avoir un abonnement actif
+        return $user->hasActiveSubscription();
     }
 }
