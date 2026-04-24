@@ -9,7 +9,8 @@ export const booksData = [
     published: 2023,
     isbn: "978-3-16-148410-0",
     cover: "https://images.unsplash.com/photo-1544947950-fa07a98d237f?auto=format&fit=crop&q=80&w=400",
-    description: "An epic journey through uncharted territories where courage meets destiny. Follow the protagonist as they navigate through challenges that test both physical and emotional boundaries."
+    description: "An epic journey through uncharted territories where courage meets destiny. Follow the protagonist as they navigate through challenges that test both physical and emotional boundaries.",
+    isPremium: true
   },
   {
     id: 2,
@@ -21,7 +22,8 @@ export const booksData = [
     published: 2022,
     isbn: "978-1-23-456789-0",
     cover: "https://images.unsplash.com/photo-1532012197267-da84d127e765?auto=format&fit=crop&q=80&w=400",
-    description: "A comprehensive guide to the fundamental principles of modern science, exploring physics, chemistry, and biology through real-world applications."
+    description: "A comprehensive guide to the fundamental principles of modern science, exploring physics, chemistry, and biology through real-world applications.",
+    isPremium: true
   },
   {
     id: 3,
@@ -125,3 +127,43 @@ export const categories = [
   "Fiction", "Science", "History", "Technology",
   "Philosophy", "Poetry", "Biography", "Self-Help"
 ];
+
+export const initialUsersData = [
+  {
+    id: 1,
+    name: "Admin User",
+    email: "admin@smartlibrary.com",
+    role: "admin",
+    isPremium: true,
+    joinDate: "2023-01-15"
+  },
+  {
+    id: 2,
+    name: "Author User",
+    email: "author@smartlibrary.com",
+    role: "author",
+    isPremium: false,
+    joinDate: "2023-03-22"
+  },
+  {
+    id: 3,
+    name: "Normal User",
+    email: "user@example.com",
+    role: "user",
+    isPremium: false,
+    joinDate: "2023-06-10"
+  }
+];
+
+export const platformStats = {
+  totalUsers: 1542,
+  totalAuthors: 124,
+  activeSubscriptions: 850,
+  totalReads: 45200
+};
+
+export const mockAuthorStats = {
+  averageRating: 4.8,
+  totalReads: 12400,
+  downloads: 850
+};

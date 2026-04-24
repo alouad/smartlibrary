@@ -31,7 +31,21 @@ export const AppProvider = ({ children }) => {
 
   const login = (userData) => {
     const existingUser = usersList.find(u => u.email === userData.email);
-    const data = existingUser || { ...userData, role: 'user', isPremium: false, joinDate: new Date().toISOString().split('T')[0] };
+    let data;
+    if (existingUser) {
+      data = existingUser;
+    } else {
+      data = { 
+        ...userData, 
+        role: userData.role || 'user', 
+        isPremium: false, 
+        joinDate: new Date().toISOString().split('T')[0],
+        id: Date.now() 
+      };
+      const newUsersList = [...usersList, data];
+      setUsersList(newUsersList);
+      localStorage.setItem('usersList', JSON.stringify(newUsersList));
+    }
     setUser(data);
     localStorage.setItem('user', JSON.stringify(data));
   };
